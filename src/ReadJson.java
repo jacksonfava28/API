@@ -43,8 +43,8 @@ public class ReadJson {
         String output = "abc";
         String totlaJson="";
         try {
-
-            URL url = new URL("https://swapi.dev/api/people/4/");
+// { = JSONobject    [ = JSONarray
+            URL url = new URL("https://pokeapi.co/api/v2/pokemon/ditto");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("GET");
             conn.setRequestProperty("Accept", "application/json");
@@ -84,21 +84,29 @@ public class ReadJson {
 
         try {
 
-            String name = (String)jsonObject.get("name");
+         //   String abilities = (String) jsonObject.get("abilities");
+           // System.out.println(abilities);
 
-            org.json.simple.JSONArray msg = (org.json.simple.JSONArray) jsonObject.get("films");
-            int n =   msg.size(); //(msg).length();
-            for (int i = 0; i < n; ++i) {
-                String test =(String) msg.get(i);
-                System.out.println(test);
-                // System.out.println(person.getInt("key"));
-            }
-            String height= (String)jsonObject.get("height");
-            System.out.println(name);
-            String mass= (String)jsonObject.get("mass");
-            System.out.println(mass);
+      //      int n = msg.size(); //(msg).length();
+         //   for (int i = 0; i < n; ++i) {
+             //   String abilities = (String) msg.get(i);
+            System.out.println("abil");
+            System.out.println(jsonObject.get("abilities"));
+//
+      //      }
+      //      String height = (String) jsonObject.get("height");
+       //     System.out.println(name);
+            //      String mass = (String) jsonObject.get("mass");
+       //     System.out.println(mass);
+
+      //      org.json.simple.JSONArray msg1 = (org.json.simple.JSONArray) jsonObject.get("starships");
+      //      n = msg1.size();
+     //       for (int i = 0; i < n; ++i) {
+            //           String test = (String) msg1.get(i);
+//                System.out.println(test);
+
+//            }
         }
-
         catch (Exception e) {
             e.printStackTrace();
         }
