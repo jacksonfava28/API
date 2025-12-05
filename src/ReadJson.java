@@ -90,8 +90,17 @@ public class ReadJson {
       //      int n = msg.size(); //(msg).length();
          //   for (int i = 0; i < n; ++i) {
              //   String abilities = (String) msg.get(i);
-            System.out.println("abil");
-            System.out.println(jsonObject.get("abilities"));
+            System.out.println("Abilities:");
+
+            org.json.simple.JSONArray abilities = (org.json.simple.JSONArray) jsonObject.get("abilities");
+
+            for (Object o : abilities) {
+                org.json.simple.JSONObject abilityObj = (org.json.simple.JSONObject) o;
+                org.json.simple.JSONObject abilityData = (org.json.simple.JSONObject) abilityObj.get("ability");
+
+                String abilityName = (String) abilityData.get("name");
+                System.out.println(abilityName);
+            }
 //
       //      }
       //      String height = (String) jsonObject.get("height");
