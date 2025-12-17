@@ -110,3 +110,6 @@ public class ReadJson implements ActionListener {
         PokemonRead(pokemon);
     }
 }
+//make the buttons smaller and display the image (goal)
+// if time permits add number and go prev and next based on that
+// make it red, cause pokedex is red, or just in general make it look closer to the thing in the anime (indigo league of course)
