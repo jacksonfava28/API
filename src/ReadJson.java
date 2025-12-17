@@ -1,129 +1,112 @@
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 
-
-// video to load jar
-//https://www.youtube.com/watch?v=QAJ09o3Xl_0
-
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
-// Program for print data in JSON format.
-public class ReadJson {
-    public static void main(String args[]) throws ParseException {
-        // In java JSONObject is used to create JSON object
-        // which is a subclass of java.util.HashMap.
+public class ReadJson implements ActionListener {
 
-        JSONObject file = new JSONObject();
-        file.put("Full Name", "Ritu Sharma");
-        file.put("Roll No.", 1704310046);
-        file.put("Tution Fees", 65400);
+    private JFrame mainFrame;
+    private JTextField searchField;
+    private JButton searchButton;
+    private JTextArea resultsArea;
 
-
-        // To print in JSON format.
-        System.out.print(file.get("Tution Fees"));
-        ReadJson readingIsWhat = new ReadJson();
-
+    public static void main(String[] args) {
+        new ReadJson();
     }
 
-    public ReadJson(){
-        try {
-            pull();
-        }catch(Exception e){
-            System.out.println(e);
-        }
+    public ReadJson() {
+        prepareGUI();
     }
 
-    public  void pull() throws ParseException {
-        String output = "abc";
-        String totlaJson="";
+    private void PokemonRead(String pokemonName) {
         try {
-// { = JSONobject    [ = JSONarray
-            URL url = new URL("https://pokeapi.co/api/v2/pokemon/ditto");
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("GET");
-            conn.setRequestProperty("Accept", "application/json");
-            //if you get the error 403, uncomment line of code below
-            //conn.setRequestProperty("User-Agent", "Mozilla/5.0"); // Add User-Agent
+            URL url = new URL("https://pokeapi.co/api/v2/pokemon/" + pokemonName.toLowerCase());
+            URLConnection urlc = url.openConnection();
+            urlc.setRequestProperty("User-Agent", "Mozilla/5.0");
 
+            BufferedReader reader = new BufferedReader(new InputStreamReader(urlc.getInputStream()));
+            String line, jsonText = "";
+            while ((line = reader.readLine()) != null) jsonText += line;
+            reader.close();
 
-            if (conn.getResponseCode() != 200) {
+            JSONParser parser = new JSONParser();
+            JSONObject jsonObject = (JSONObject) parser.parse(jsonText);
 
-                throw new RuntimeException("Failed : HTTP error code : "
-                        + conn.getResponseCode());
+            resultsArea.setText("");
+            resultsArea.append("Name: " + jsonObject.get("name") + "\n\n");
+
+            JSONObject sprites = (JSONObject) jsonObject.get("sprites");
+            String imageUrl = (String) sprites.get("front_default");
+            if (imageUrl != null) resultsArea.append("Image URL: " + imageUrl + "\n\n");
+
+            resultsArea.append("Types:\n");
+            JSONArray types = (JSONArray) jsonObject.get("types");
+            for (Object o : types) {
+                JSONObject typeObj = (JSONObject) o;
+                JSONObject typeData = (JSONObject) typeObj.get("type");
+                resultsArea.append("- " + typeData.get("name") + "\n");
             }
 
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    (conn.getInputStream())));
-
-
-            System.out.println("Output from Server .... \n");
-            while ((output = br.readLine()) != null) {
-                System.out.println(output);
-                totlaJson+=output;
-            }
-
-            conn.disconnect();
-
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        JSONParser parser = new JSONParser();
-        //System.out.println(str);
-        org.json.simple.JSONObject jsonObject = (org.json.simple.JSONObject) parser.parse(totlaJson);
-        System.out.println(jsonObject);
-
-        try {
-
-         //   String abilities = (String) jsonObject.get("abilities");
-           // System.out.println(abilities);
-
-      //      int n = msg.size(); //(msg).length();
-         //   for (int i = 0; i < n; ++i) {
-             //   String abilities = (String) msg.get(i);
-            System.out.println("Abilities:");
-
-            org.json.simple.JSONArray abilities = (org.json.simple.JSONArray) jsonObject.get("abilities");
-
+            resultsArea.append("\nAbilities:\n");
+            JSONArray abilities = (JSONArray) jsonObject.get("abilities");
             for (Object o : abilities) {
-                org.json.simple.JSONObject abilityObj = (org.json.simple.JSONObject) o;
-                org.json.simple.JSONObject abilityData = (org.json.simple.JSONObject) abilityObj.get("ability");
-
-                String abilityName = (String) abilityData.get("name");
-                System.out.println(abilityName);
+                JSONObject abilityObj = (JSONObject) o;
+                JSONObject abilityData = (JSONObject) abilityObj.get("ability");
+                resultsArea.append("- " + abilityData.get("name") + "\n");
             }
-//
-      //      }
-      //      String height = (String) jsonObject.get("height");
-       //     System.out.println(name);
-            //      String mass = (String) jsonObject.get("mass");
-       //     System.out.println(mass);
 
-      //      org.json.simple.JSONArray msg1 = (org.json.simple.JSONArray) jsonObject.get("starships");
-      //      n = msg1.size();
-     //       for (int i = 0; i < n; ++i) {
-            //           String test = (String) msg1.get(i);
-//                System.out.println(test);
+            JSONObject species = (JSONObject) jsonObject.get("species");
+            String speciesUrl = (String) species.get("url");
+            URL sUrl = new URL(speciesUrl);
+            URLConnection sConn = sUrl.openConnection();
+            sConn.setRequestProperty("User-Agent", "Mozilla/5.0");
 
-//            }
+            BufferedReader sReader = new BufferedReader(new InputStreamReader(sConn.getInputStream()));
+            String speciesJson = "";
+            while ((line = sReader.readLine()) != null) speciesJson += line;
+            sReader.close();
+
+            JSONObject speciesObj = (JSONObject) parser.parse(speciesJson);
+            JSONObject generation = (JSONObject) speciesObj.get("generation");
+            resultsArea.append("\nRegion: " + generation.get("name"));
+
+        } catch (Exception ex) {
+            resultsArea.setText("Pokémon not found.");
         }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
+    }
 
-//k
+    private void prepareGUI() {
+        mainFrame = new JFrame("Pokédex Search");
+        mainFrame.setSize(500, 600);
+        mainFrame.setLayout(new GridLayout(4, 1));
 
+        searchField = new JTextField("Enter Pokémon Name:");
+        searchButton = new JButton("Search");
+        searchButton.addActionListener(this);
 
+        resultsArea = new JTextArea();
+        resultsArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(resultsArea);
+
+        mainFrame.add(searchField);
+        mainFrame.add(searchButton);
+        mainFrame.add(scrollPane);
+
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String pokemon = searchField.getText().trim();
+        if (pokemon.isEmpty() || pokemon.equals("Enter Pokémon Name:")) return;
+        PokemonRead(pokemon);
     }
 }
-
-
